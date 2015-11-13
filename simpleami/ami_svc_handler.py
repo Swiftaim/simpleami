@@ -1,6 +1,6 @@
 import socket
 from time import sleep
-from simpleami.scv_handler import SvcHandler
+from simpleami.svc_handler import SvcHandler
 
 
 class AMISvcHandler(SvcHandler):
@@ -8,57 +8,45 @@ class AMISvcHandler(SvcHandler):
     methods for passing commands to the AMI as well as simplifying common tasks.
     """
     def __init__(self, host, port):
-        super().__init__(self, host, port)
+        super().__init__(host, port)
+        self.sock_ = None
 
     def connect(self, username, password):
         try:
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.connect(HOST, PORT)
+            self.sock_ = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.sock_.connect((self.host_, self.port_))
             return self.do_command(self.build_login_command(username, password))
+            
         except Exception as exc:
             print(exc)
             raise
 
-    def do_command(self, sock, command):
+    def do_command(self, command):
         """Sends a multi-line command over the AMI connection."""
+        if self.sock_ == None:
+            raise "not connected!"
         try:
             for l in command.split('\n'):
                 print("> ", l)
-                sock.send(str(l+'\r\n').encode())
-            return self.wait_for_response(sock)
+                self.sock_.send(str(l+'\r\n').encode())
+            return self.wait_for_response()
+
         except Exception as exc:
             print(exc)
             raise
 
-    def make_call(self, phone_to_dial, username, password, local_user):
+    def wait_for_response(self):
+        if self.sock_ == None:
+            raise "not connected!"
         try:
-            print("click_to_call")
+            data = self.sock_.recv(1024)
+            for l in data.decode().split('\r\n'):
+                print("< {0}".format(l))
+            return data
 
-            data = s.recv(1024)
-
-            do_command(s, pattern)
-            self.wait_for_response(s)
-            sleep(1)
-
-            pattern = originate_cmd % dict(local_user=local_user, phone_to_dial=phone_to_dial)
-            do_command(s, pattern)
-
-            while True:
-                data = s.recv(1024)
-                for l in data.decode().split('\r\n'):
-                    print("< {0}".format(l))
-                sleep(1)
-
-            s.close()
         except Exception as exc:
             print(exc)
             raise
-
-    def wait_for_response(self, sock):
-        data = sock.recv(1024)
-        for l in data.decode().split('\r\n'):
-            print("< {0}".format(l))
-        return data
 
     def build_login_command(self, username, password):
         try:
