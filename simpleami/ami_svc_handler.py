@@ -2,8 +2,11 @@ import socket
 
 
 class AMISvcHandler:
-    """AMISvcHandler provides a connection to the Asterisk AMI Manager interface. The class also provides
-    methods for passing commands to the AMI as well as simplifying common tasks.
+    """AMISvcHandler provides a connection to the Asterisk AMI Manager interface.
+    The class also provides methods for passing commands to the AMI as well as
+    simplifying common tasks.
+    For more info on Asterisk AMI:
+      http://www.voip-info.org/wiki/view/Asterisk+manager+API
     """
     def __init__(self, host, port):
         """Provide the AMI host and port."""
