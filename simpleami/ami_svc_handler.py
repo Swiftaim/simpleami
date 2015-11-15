@@ -1,14 +1,12 @@
 import socket
-from time import sleep
-from simpleami.svc_handler import SvcHandler
 
-
-class AMISvcHandler(SvcHandler):
+class AMISvcHandler:
     """AMISvcHandler provides a connection to the Asterisk AMI Manager interface. The class also provides
     methods for passing commands to the AMI as well as simplifying common tasks.
     """
     def __init__(self, host, port):
-        super().__init__(host, port)
+        self.host_ = host
+        self.port_ = port
         self.sock_ = None
 
     def connect(self, username, password):
@@ -23,7 +21,7 @@ class AMISvcHandler(SvcHandler):
 
     def do_command(self, command):
         """Sends a multi-line command over the AMI connection."""
-        if self.sock_ == None:
+        if self.sock_ is None:
             raise "not connected!"
         try:
             for l in command.split('\n'):
@@ -50,11 +48,10 @@ class AMISvcHandler(SvcHandler):
 
     def build_login_command(self, username, password):
         try:
-            login_cmd = """Action: login
-Username: %(username)s
-Secret: %(password)s
-Events: off
-"""
+            login_cmd = ('Action: login\r\n'
+                         'Username: %(username)s\r\n'
+                         'Secret: %(password)s\r\n'
+                         'Events: off\r\n')
             return login_cmd % dict(username=username, password=password)
         except Exception as exc:
             print(exc)
