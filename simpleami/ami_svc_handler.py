@@ -23,7 +23,7 @@ class AMISvcHandler:
         try:
             self.sock_ = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.sock_.connect((self.host_, self.port_))
-            options = LoginOptions(username=username, password=password, action_id='AID-1234')
+            options = LoginOptions(username=username, password=password)
             return self.send_action(login_template(options))
 
         except Exception as exc:

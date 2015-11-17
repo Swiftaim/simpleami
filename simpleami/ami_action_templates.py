@@ -1,7 +1,7 @@
 from collections import namedtuple
 
 # Mandatory login options. Action ID is useful for matching responses to action requests.
-LoginOptions = namedtuple('LoginOptions', ['username', 'password', 'action_id'])
+LoginOptions = namedtuple('LoginOptions', ['username', 'password'])
 
 
 def login_template(login_options):
@@ -11,17 +11,15 @@ def login_template(login_options):
     """
     assert isinstance(login_options, LoginOptions)
 
-    template = """Action: Login\r\n,
-                Username: %(username)s\r\n,
-                Secret: %(password)s\r\n,
-                ActionID: %(action_id)s\r\n,
-                Events: off\r\n
-                """
+    template = """Action: Login
+Events: off
+Username: %(username)s
+Secret: %(password)s
+"""
 
     action = template % {
         'username': login_options.username,
         'password': login_options.password,
-        'action_id': login_options.action_id
     }
     return action
 
@@ -41,25 +39,26 @@ OriginateOptions = namedtuple('OriginateOptions',
 def originate_template(originate_options):
     assert isinstance(originate_options, OriginateOptions)
 
-    template = """Action: Originate\r\n,
-                Channel: %(type)s/%(number)s@%(channel)s\r\n,
-                CallerID: <%(caller_id)s>\r\n,
-                Context: %(context)s\r\n,
-                Priority: %(priority)s\r\n,
-                Exten: %(extension)s\r\n,
-                Async: True\r\n,
-                Timeout: %(timeout)s\r\n,
-                ActionID: %(action_id)
-                """
+    template = """Action: Originate
+Channel: %(type)s/%(number)s@%(channel)s
+CallerID: <%(caller_id)s>
+Context: %(context)s
+Priority: %(priority)s
+Exten: %(extension)s
+Async: True
+Timeout: %(timeout)s
+ActionID: %(action_id)s
+"""
 
     action = template % {
         'type': originate_options.type,
         'number': originate_options.number,
-        'timeout': originate_options.timeout,
-        'callerid': originate_options.callerid,
+        'channel': originate_options.channel,
+        'caller_id': originate_options.caller_id,
         'context': originate_options.context,
-        'context_local': originate_options.context_local,
-        'exten': originate_options.exten,
-        'actionid': originate_options.actionid,
+        'priority': originate_options.priority,
+        'extension': originate_options.extension,
+        'timeout': originate_options.timeout,
+        'action_id': originate_options.action_id
     }
     return action
