@@ -1,4 +1,5 @@
 import socket
+from .ami_action_templates import *
 
 
 class AMISvcHandler:
@@ -8,6 +9,7 @@ class AMISvcHandler:
     For more info on Asterisk AMI:
       http://www.voip-info.org/wiki/view/Asterisk+manager+API
     """
+
     def __init__(self, host, port):
         """Provide the AMI host and port."""
         self.host_ = host
@@ -21,8 +23,9 @@ class AMISvcHandler:
         try:
             self.sock_ = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.sock_.connect((self.host_, self.port_))
-            return self.send_action(self.build_login_command(username, password))
-            
+            options = LoginOptions(username=username, password=password, action_id='AID-1234')
+            return self.send_action(login_template(options))
+
         except Exception as exc:
             raise exc
 
@@ -35,7 +38,7 @@ class AMISvcHandler:
             raise "not connected!"
         try:
             for l in command.split('\n'):
-                self.sock_.send(str(l+'\r\n').encode())
+                self.sock_.send(str(l + '\r\n').encode())
             return self.wait_for_response()
 
         except Exception as exc:
@@ -51,15 +54,5 @@ class AMISvcHandler:
         try:
             return self.sock_.recv(1024)
 
-        except Exception as exc:
-            raise exc
-
-    def build_login_command(self, username, password):
-        try:
-            login_cmd = ('Action: login\r\n'
-                         'Username: %(username)s\r\n'
-                         'Secret: %(password)s\r\n'
-                         'Events: off\r\n')
-            return login_cmd % dict(username=username, password=password)
         except Exception as exc:
             raise exc
