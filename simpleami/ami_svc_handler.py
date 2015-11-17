@@ -29,7 +29,7 @@ class AMISvcHandler:
         except Exception as exc:
             raise exc
 
-    def send_action(self, command):
+    def send_action(self, action):
         """Sends a multi-line command over the AMI connection.
         Only one outstanding AMI action is allowed.
         :rtype : AMI response raw data
@@ -37,8 +37,8 @@ class AMISvcHandler:
         if self.sock_ is None:
             raise "not connected!"
         try:
-            for l in command.split('\n'):
-                self.sock_.send(str(l + '\r\n').encode())
+            for instruction in action.split('\n'):
+                self.sock_.send(str(instruction + '\r\n').encode())
             return self.wait_for_response()
 
         except Exception as exc:
